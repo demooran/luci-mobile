@@ -3,8 +3,6 @@ name: Build APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -27,11 +25,20 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Generate Debug Keystore
+        run: |
+          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
       - name: Get Dependencies
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release \
+          --android-project-arg=android.injected.signing.store.file=${{ github.workspace }}/debug.keystore \
+          --android-project-arg=android.injected.signing.store.password=android \
+          --android-project-arg=android.injected.signing.key.alias=androiddebugkey \
+          --android-project-arg=android.injected.signing.key.password=android
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
