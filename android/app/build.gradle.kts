@@ -29,18 +29,8 @@ android {
         versionName = flutter.versionName
     }
 
-    signingConfigs {
-    create("release") {
-        storeFile = file(System.getenv("HOME") + "/.android/debug.keystore")
-        storePassword = "android"
-        keyAlias = "androiddebugkey"
-        keyPassword = "android"
-    }
-}
-
     buildTypes {
     getByName("release") {
-        signingConfig = signingConfigs.getByName("release")
         isMinifyEnabled = false
         isShrinkResources = false
     }
